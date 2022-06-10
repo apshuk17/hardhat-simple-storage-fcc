@@ -1,7 +1,9 @@
-const { ethers, run, network } = require("hardhat");
+import { ethers, run, network } from "hardhat";
 require("dotenv").config();
 
-const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY.toString().trim();
+const ETHERSCAN_API_KEY: string = process.env.ETHERSCAN_API_KEY
+  ? process.env.ETHERSCAN_API_KEY.toString().trim()
+  : "";
 
 const main = async () => {
   const SimpleStorageFactory = await ethers.getContractFactory("SimpleStorage");
@@ -9,34 +11,34 @@ const main = async () => {
 
   const simpleStorage = await SimpleStorageFactory.deploy();
   await simpleStorage.deployed();
-  console.log('##Contract Address', simpleStorage.address);
+  console.log("##Contract Address", simpleStorage.address);
 
   if (network.config.chainId === 4 && ETHERSCAN_API_KEY) {
-    console.log('##Waiting for the confirmations...');
+    console.log("##Waiting for the confirmations...");
     await simpleStorage.deployTransaction.wait(6);
     await verify(simpleStorage.address, []);
   }
 
   let favoriteNumber = await simpleStorage.retrieve();
-  console.log('##Initial fav', favoriteNumber.toString());
+  console.log("##Initial fav", favoriteNumber.toString());
 
   // Update the current values
   const txResponse = await simpleStorage.store(7);
   await txResponse.wait(1);
   favoriteNumber = await simpleStorage.retrieve();
-  console.log('##Updated fav', favoriteNumber.toString());
+  console.log("##Updated fav", favoriteNumber.toString());
 };
 
-const verify = async (contractAddr, args) => {
+const verify = async (contractAddr: string, args: any[]) => {
   console.log("Verifying contract...");
   try {
     await run("verify:verify", {
       address: contractAddr,
       constructorArguments: args,
     });
-  } catch (e) {
-    if (e.message.toLowerCase().includes('already verified')) {
-      console.log('Already Verified');
+  } catch (e: any) {
+    if (e.message.toLowerCase().includes("already verified")) {
+      console.log("Already Verified");
     } else {
       console.error(e);
     }
