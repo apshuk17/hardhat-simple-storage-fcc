@@ -1,5 +1,5 @@
 import { ethers, run, network } from "hardhat";
-require("dotenv").config();
+import "dotenv/config";
 
 const ETHERSCAN_API_KEY: string = process.env.ETHERSCAN_API_KEY
   ? process.env.ETHERSCAN_API_KEY.toString().trim()
